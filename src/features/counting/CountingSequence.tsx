@@ -70,14 +70,12 @@ const generateSessionPlan = (problemCount: number, difficulty: Difficulty): Sequ
         startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
       } else if (stepSize === 5) {
         // For counting by 5s, always start with a number ending in 0 or 5
-        const maxStart = 30
-        const randomMultiple = Math.floor(Math.random() * (maxStart / 5)) * 5 + 5 // 5, 10, 15, 20, 25, 30
-        startNum = randomMultiple
+        const validStarts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
       } else if (stepSize === 10) {
-        // For counting by 10s, always start with a number ending in 0
-        const maxStart = 20
-        const randomMultiple = Math.floor(Math.random() * (maxStart / 10)) * 10 + 10 // 10, 20, 30, etc.
-        startNum = randomMultiple
+        // For counting by 10s, always start with a number ending in 0 or 5
+        const validStarts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
       } else {
         // For counting by 1s, any number is fine
         const maxStart = 50
