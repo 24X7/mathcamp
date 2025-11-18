@@ -21,12 +21,16 @@ export class AnalyticsService {
   trackAppStarted(): void {
     console.log('[AnalyticsService] trackAppStarted called, postHog:', !!this.postHog)
     if (this.postHog) {
-      this.postHog.capture('app_started', {
-        version: APP_VERSION,
-        platform: 'web',
-        timestamp: Date.now(),
-      })
-      console.log('[AnalyticsService] app_started event sent')
+      try {
+        this.postHog.capture('app_started', {
+          version: APP_VERSION,
+          platform: 'web',
+          timestamp: Date.now(),
+        })
+        console.log('[AnalyticsService] app_started event sent')
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send app_started event:', error)
+      }
     } else {
       console.warn('[AnalyticsService] PostHog not initialized, event not sent')
     }
@@ -39,10 +43,14 @@ export class AnalyticsService {
    */
   trackSessionStart(activityType: ProblemType): void {
     if (this.postHog) {
-      this.postHog.capture('session_started', {
-        version: APP_VERSION,
-        platform: 'web',
-      })
+      try {
+        this.postHog.capture('session_started', {
+          version: APP_VERSION,
+          platform: 'web',
+        })
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send session_started event:', error)
+      }
     }
 
     // Local: Full session tracking
@@ -56,10 +64,14 @@ export class AnalyticsService {
    */
   trackActivitySelected(activityType: ProblemType, questionCount: number): void {
     if (this.postHog) {
-      this.postHog.capture('activity_selected', {
-        activity_type: activityType,
-        question_count: questionCount,
-      })
+      try {
+        this.postHog.capture('activity_selected', {
+          activity_type: activityType,
+          question_count: questionCount,
+        })
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send activity_selected event:', error)
+      }
     }
 
     // Local: Track preferences
@@ -85,12 +97,16 @@ export class AnalyticsService {
    */
   trackSessionCompleted(summary: SessionSummary): void {
     if (this.postHog) {
-      this.postHog.capture('session_completed', {
-        activity_type: summary.type,
-        total_problems: summary.total,
-        duration_bucket: this.bucketDuration(summary.duration),
-        // NO accuracy, NO scores - privacy first!
-      })
+      try {
+        this.postHog.capture('session_completed', {
+          activity_type: summary.type,
+          total_problems: summary.total,
+          duration_bucket: this.bucketDuration(summary.duration),
+          // NO accuracy, NO scores - privacy first!
+        })
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send session_completed event:', error)
+      }
     }
 
     // Local: Full details
@@ -104,12 +120,16 @@ export class AnalyticsService {
    */
   trackError(error: Error, context?: Record<string, any>): void {
     if (this.postHog) {
-      this.postHog.capture('error_occurred', {
-        error_message: error.message,
-        error_stack: error.stack?.substring(0, 500), // Truncate
-        context,
-        version: APP_VERSION,
-      })
+      try {
+        this.postHog.capture('error_occurred', {
+          error_message: error.message,
+          error_stack: error.stack?.substring(0, 500), // Truncate
+          context,
+          version: APP_VERSION,
+        })
+      } catch (captureError) {
+        console.warn('[AnalyticsService] Failed to send error_occurred event:', captureError)
+      }
     }
   }
 
@@ -120,11 +140,15 @@ export class AnalyticsService {
    */
   trackPerformance(metric: string, value: number, unit: string = 'ms'): void {
     if (this.postHog) {
-      this.postHog.capture('performance_metric', {
-        metric,
-        value,
-        unit,
-      })
+      try {
+        this.postHog.capture('performance_metric', {
+          metric,
+          value,
+          unit,
+        })
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send performance_metric event:', error)
+      }
     }
   }
 
@@ -135,10 +159,14 @@ export class AnalyticsService {
    */
   trackFeatureFlagEvaluated(flag: string, enabled: boolean): void {
     if (this.postHog) {
-      this.postHog.capture('feature_flag_evaluated', {
-        flag,
-        enabled,
-      })
+      try {
+        this.postHog.capture('feature_flag_evaluated', {
+          flag,
+          enabled,
+        })
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send feature_flag_evaluated event:', error)
+      }
     }
   }
 
@@ -164,6 +192,25 @@ export class AnalyticsService {
     if (ms < 10 * 60 * 1000) return '5-10min'
     if (ms < 20 * 60 * 1000) return '10-20min'
     return '20+min'
+  }
+
+  /**
+   * Track pageview
+   * PostHog: Pageview tracking for web analytics
+   * Local: Nothing
+   */
+  trackPageView(path: string, context?: Record<string, any>): void {
+    if (this.postHog) {
+      try {
+        this.postHog.capture('$pageview', {
+          $current_url: typeof window !== 'undefined' ? window.location.href : '',
+          $pathname: path,
+          ...context,
+        })
+      } catch (error) {
+        console.warn('[AnalyticsService] Failed to send pageview:', error)
+      }
+    }
   }
 
   /**

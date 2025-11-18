@@ -25,37 +25,51 @@ if (POSTHOG_API_KEY) {
     disable_surveys: true, // No surveys for kids
     opt_out_capturing_by_default: false,
 
-    // Performance
+    // Error handling - silence ad blocker errors
+    advanced_disable_decide: false, // Keep feature flags
+    disable_compression: false, // Keep compression
+    disable_persistence: false, // Keep persistence
+    persistence: 'localStorage', // Use localStorage
+
+    // Request settings - reduce retries to minimize console spam
+    batch_max_attempts: 3, // Reduce from default (many retries)
+    xhr_headers: {}, // No custom headers needed
+
+    // Silence verbose logging in production
     loaded: (ph) => {
+      // Only enable debug in dev mode
       if (import.meta.env.DEV) {
-        ph.debug() // Enable debug mode in development
+        console.log('[PostHog] Initialized successfully')
       }
-      console.log('[PostHog] Initialized successfully')
-      console.log('[PostHog] Config:', ph.config)
-      console.log('[PostHog] Is feature flags enabled?', ph.config.hasFeatureFlags)
 
-      // Send a test event immediately
-      ph.capture('posthog_initialized', {
-        timestamp: new Date().toISOString(),
-        test: true
-      })
-      console.log('[PostHog] Sent test event: posthog_initialized')
+      // Suppress PostHog's error logging by overriding console methods temporarily
+      // This prevents "ERR_BLOCKED_BY_CLIENT" spam in console
+      const originalError = console.error
+      const originalWarn = console.warn
 
-      // Manually capture pageview to ensure it's sent
-      ph.capture('$pageview', {
-        $current_url: window.location.href,
-        $host: window.location.host,
-        $pathname: window.location.pathname
-      })
-      console.log('[PostHog] Manually sent $pageview event')
-
-      // Force flush to send events immediately
-      setTimeout(() => {
-        if (ph._flush) {
-          ph._flush()
-          console.log('[PostHog] Flushed event queue')
+      // Filter out PostHog retry/fetch errors
+      console.error = (...args: any[]) => {
+        const message = args[0]?.toString() || ''
+        if (
+          message.includes('[PostHog.js]') &&
+          (message.includes('Failed to fetch') ||
+           message.includes('Enqueued failed request') ||
+           message.includes('ERR_BLOCKED_BY_CLIENT'))
+        ) {
+          // Silently ignore - ad blocker is blocking, this is expected
+          return
         }
-      }, 1000)
+        originalError.apply(console, args)
+      }
+
+      console.warn = (...args: any[]) => {
+        const message = args[0]?.toString() || ''
+        if (message.includes('[PostHog.js]') && message.includes('retry')) {
+          // Silently ignore retry warnings
+          return
+        }
+        originalWarn.apply(console, args)
+      }
     },
 
     // Sanitize properties to prevent accidental PII leakage

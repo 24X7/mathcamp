@@ -68,17 +68,13 @@ function GameContent() {
     // Update URL without reloading
     window.history.replaceState(null, '', path)
 
-    // Track pageview
-    if (typeof window !== 'undefined' && (window as any).posthog) {
-      (window as any).posthog.capture('$pageview', {
-        $current_url: window.location.href,
-        $pathname: path,
-        game_mode: gameMode,
-        activity: currentActivity,
-        question_number: problemCount + 1,
-      })
-    }
-  }, [gameMode, currentActivity, problemCount])
+    // Track pageview using AnalyticsService
+    analytics.trackPageView(path, {
+      game_mode: gameMode,
+      activity: currentActivity,
+      question_number: problemCount + 1,
+    })
+  }, [gameMode, currentActivity, problemCount, analytics])
 
   const activities: { type: ProblemType; name: string; emoji: string; color: string }[] = [
     { type: 'addition', name: 'Addition', emoji: '➕', color: 'bg-blue-500' },
