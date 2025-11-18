@@ -51,6 +51,35 @@ function GameContent() {
     analytics.trackAppStarted()
   }, [analytics])
 
+  // Track page views and update URL when gameMode or problem changes
+  useEffect(() => {
+    let path = '/'
+
+    if (gameMode === 'menu') {
+      path = '/'
+    } else if (gameMode === 'playing') {
+      path = `/${currentActivity}/question/${problemCount + 1}`
+    } else if (gameMode === 'results') {
+      path = `/${currentActivity}/results`
+    } else if (gameMode === 'progress') {
+      path = '/progress'
+    }
+
+    // Update URL without reloading
+    window.history.replaceState(null, '', path)
+
+    // Track pageview
+    if (typeof window !== 'undefined' && (window as any).posthog) {
+      (window as any).posthog.capture('$pageview', {
+        $current_url: window.location.href,
+        $pathname: path,
+        game_mode: gameMode,
+        activity: currentActivity,
+        question_number: problemCount + 1,
+      })
+    }
+  }, [gameMode, currentActivity, problemCount])
+
   const activities: { type: ProblemType; name: string; emoji: string; color: string }[] = [
     { type: 'addition', name: 'Addition', emoji: '➕', color: 'bg-blue-500' },
     { type: 'subtraction', name: 'Subtraction', emoji: '➖', color: 'bg-red-500' },
