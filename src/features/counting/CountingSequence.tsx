@@ -22,6 +22,7 @@ interface CountingSequenceProps {
 const generateSessionPlan = (problemCount: number, difficulty: Difficulty): SequencePlan[] => {
   const plan: SequencePlan[] = []
   const usedAnswers = new Set<number>()
+  const stepSizeCounts: Record<number, number> = { 2: 0, 3: 0, 5: 0, 10: 0 }
 
   for (let i = 0; i < problemCount; i++) {
     let planItem: SequencePlan | null = null
@@ -30,17 +31,29 @@ const generateSessionPlan = (problemCount: number, difficulty: Difficulty): Sequ
 
     // Try to find a unique sequence
     while (!planItem && attempts < maxAttempts) {
-      // Prioritize 5 and 10 heavily, mix in 1 and 2 occasionally
-      const stepChance = Math.random()
       let stepSize: number
 
       if (difficulty === 'easy') {
-        stepSize = stepChance < 0.3 ? 1 : 2
+        // Easy: 1s and 2s
+        stepSize = Math.random() < 0.3 ? 1 : 2
       } else if (difficulty === 'medium') {
-        stepSize = stepChance < 0.15 ? 1 : stepChance < 0.3 ? 2 : 5
+        // Medium: Ensure at least one of each 2, 3, 5
+        const needsStepSize = [2, 3, 5].find(s => stepSizeCounts[s] === 0 && plan.length < problemCount - 1)
+        if (needsStepSize && i < problemCount - 2) {
+          stepSize = needsStepSize
+        } else {
+          const stepChance = Math.random()
+          stepSize = stepChance < 0.15 ? 1 : stepChance < 0.35 ? 2 : stepChance < 0.55 ? 3 : 5
+        }
       } else {
-        // Hard: heavily favor 5 and 10
-        stepSize = stepChance < 0.1 ? 1 : stepChance < 0.2 ? 2 : stepChance < 0.4 ? 5 : 10
+        // Hard: Ensure at least one of each 2, 3, 5, 10
+        const needsStepSize = [2, 3, 5, 10].find(s => stepSizeCounts[s] === 0 && plan.length < problemCount - 1)
+        if (needsStepSize && i < problemCount - 3) {
+          stepSize = needsStepSize
+        } else {
+          const stepChance = Math.random()
+          stepSize = stepChance < 0.1 ? 1 : stepChance < 0.25 ? 2 : stepChance < 0.4 ? 3 : stepChance < 0.65 ? 5 : 10
+        }
       }
 
       // Generate random start based on step size
@@ -51,6 +64,10 @@ const generateSessionPlan = (problemCount: number, difficulty: Difficulty): Sequ
         const maxStart = 40
         const randomEven = Math.floor(Math.random() * (maxStart / 2)) * 2 + 2 // 2, 4, 6, 8, etc.
         startNum = randomEven
+      } else if (stepSize === 3) {
+        // For counting by 3s, always start with a number ending in 0, 3, 6, or 9
+        const validStarts = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]
+        startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
       } else if (stepSize === 5) {
         // For counting by 5s, always start with a number ending in 0 or 5
         const maxStart = 30
@@ -79,6 +96,11 @@ const generateSessionPlan = (problemCount: number, difficulty: Difficulty): Sequ
       if (!usedAnswers.has(correctAnswer)) {
         planItem = { stepSize, startNum, correctAnswer }
         usedAnswers.add(correctAnswer)
+
+        // Track step size counts
+        if (stepSize in stepSizeCounts) {
+          stepSizeCounts[stepSize]++
+        }
       }
 
       attempts++
