@@ -44,8 +44,28 @@ const generateSessionPlan = (problemCount: number, difficulty: Difficulty): Sequ
       }
 
       // Generate random start based on step size
-      const maxStart = stepSize === 1 ? 50 : stepSize === 2 ? 40 : stepSize === 5 ? 30 : 20
-      const startNum = Math.floor(Math.random() * maxStart) + 1
+      let startNum: number
+
+      if (stepSize === 2) {
+        // For counting by 2s, always start with an even number
+        const maxStart = 40
+        const randomEven = Math.floor(Math.random() * (maxStart / 2)) * 2 + 2 // 2, 4, 6, 8, etc.
+        startNum = randomEven
+      } else if (stepSize === 5) {
+        // For counting by 5s, always start with a number ending in 0 or 5
+        const maxStart = 30
+        const randomMultiple = Math.floor(Math.random() * (maxStart / 5)) * 5 + 5 // 5, 10, 15, 20, 25, 30
+        startNum = randomMultiple
+      } else if (stepSize === 10) {
+        // For counting by 10s, always start with a number ending in 0
+        const maxStart = 20
+        const randomMultiple = Math.floor(Math.random() * (maxStart / 10)) * 10 + 10 // 10, 20, 30, etc.
+        startNum = randomMultiple
+      } else {
+        // For counting by 1s, any number is fine
+        const maxStart = 50
+        startNum = Math.floor(Math.random() * maxStart) + 1
+      }
 
       // Calculate correct answer
       const sequenceLength = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6

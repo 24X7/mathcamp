@@ -51,17 +51,17 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
       case 'easy':
         targetCount = Math.floor(Math.random() * 4) + 2 // 2-5 target items
         totalItems = targetCount + Math.floor(Math.random() * 3) + 2 // 4-8 total
-        layout = Math.random() > 0.5 ? 'line' : 'scattered'
+        layout = Math.random() > 0.5 ? 'line' : 'grid'
         break
       case 'medium':
         targetCount = Math.floor(Math.random() * 5) + 4 // 4-8 target items
         totalItems = targetCount + Math.floor(Math.random() * 4) + 3 // 7-12 total
-        layout = ['scattered', 'line', 'grid'][Math.floor(Math.random() * 3)] as LayoutType
+        layout = Math.random() > 0.5 ? 'line' : 'grid'
         break
       case 'hard':
         targetCount = Math.floor(Math.random() * 6) + 6 // 6-11 target items
         totalItems = targetCount + Math.floor(Math.random() * 6) + 5 // 11-22 total
-        layout = ['scattered', 'line', 'grid'][Math.floor(Math.random() * 3)] as LayoutType
+        layout = Math.random() > 0.5 ? 'line' : 'grid'
         break
     }
 
@@ -110,7 +110,8 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
           y: 50,
         }
       })
-    } else if (layout === 'grid') {
+    } else {
+      // Grid layout
       const cols = Math.ceil(Math.sqrt(newItems.length))
       const itemWidth = 80 / cols
       const itemHeight = 80 / cols
@@ -120,14 +121,6 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
         item.position = {
           x: 10 + col * itemWidth + itemWidth / 2,
           y: 10 + row * itemHeight + itemHeight / 2,
-        }
-      })
-    } else {
-      // Scattered layout
-      newItems.forEach((item) => {
-        item.position = {
-          x: Math.random() * 70 + 15, // 15-85% of container width
-          y: Math.random() * 70 + 15, // 15-85% of container height
         }
       })
     }

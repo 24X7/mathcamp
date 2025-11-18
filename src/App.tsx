@@ -41,6 +41,7 @@ function GameContent() {
   const [problemCount, setProblemCount] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [confettiType, setConfettiType] = useState<'regular' | 'fireworks'>('regular')
   const [sessionPlan, setSessionPlan] = useState<SessionPlan[]>([])
   const [sessionStartTime, setSessionStartTime] = useState<number>(0)
 
@@ -112,9 +113,9 @@ function GameContent() {
     setProblemCount(prev => prev + 1)
     if (isCorrect) {
       setCorrectCount(prev => prev + 1)
-      if (Math.random() > 0.7) {
-        setShowConfetti(true)
-      }
+      // Always show confetti on correct answer
+      setConfettiType('regular')
+      setShowConfetti(true)
     }
 
     if (problemCount + 1 >= settings.problemCount) {
@@ -136,7 +137,16 @@ function GameContent() {
     if (sessionId) {
       endSession(sessionId)
       const achievements = checkAchievements()
-      if (achievements.length > 0) {
+
+      // Check if they got 100%
+      const got100Percent = correctCount === settings.problemCount
+      if (got100Percent) {
+        // Big fireworks for 100%!
+        setConfettiType('fireworks')
+        setShowConfetti(true)
+      } else if (achievements.length > 0) {
+        // Regular confetti for achievements
+        setConfettiType('regular')
         setShowConfetti(true)
       }
 
@@ -568,7 +578,7 @@ function GameContent() {
         )}
       </AnimatePresence>
 
-      <Confetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <Confetti trigger={showConfetti} type={confettiType} onComplete={() => setShowConfetti(false)} />
     </div>
   )
 }

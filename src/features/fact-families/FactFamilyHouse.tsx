@@ -7,6 +7,8 @@ import { Check, X } from 'lucide-react'
 
 interface FactFamilyHouseProps {
   family: FactFamily
+  sessionPlan: any[]
+  currentProblemIndex: number
   onComplete: (correct: boolean) => void
 }
 
@@ -94,8 +96,19 @@ export const FactFamilyHouse: React.FC<FactFamilyHouseProps> = ({ family, onComp
     // Only allow numbers
     if (value === '' || /^\d+$/.test(value)) {
       setUserAnswers(prev => ({ ...prev, [id]: value }))
-      // Reset check state when user modifies answer
-      setCheckedAnswers(prev => ({ ...prev, [id]: null }))
+
+      // Automatically check the answer when user types
+      if (value !== '') {
+        const equation = equations.find(e => e.id === id)
+        if (equation) {
+          const userAnswer = parseInt(value)
+          const isCorrect = userAnswer === equation.answer
+          setCheckedAnswers(prev => ({ ...prev, [id]: isCorrect }))
+        }
+      } else {
+        // Reset check state when user clears answer
+        setCheckedAnswers(prev => ({ ...prev, [id]: null }))
+      }
     }
   }
 
@@ -119,15 +132,27 @@ export const FactFamilyHouse: React.FC<FactFamilyHouseProps> = ({ family, onComp
   }
 
   const handleDoneClick = () => {
+    console.log('[FactFamily] Done button clicked')
+    console.log('[FactFamily] User answers:', userAnswers)
+    console.log('[FactFamily] Checked answers:', checkedAnswers)
+
     // Verify all answers are correct
     const allCorrect = equations.every(equation => {
       const userAnswer = parseInt(userAnswers[equation.id])
-      return userAnswer === equation.answer
+      const isCorrect = userAnswer === equation.answer
+      console.log(`[FactFamily] ${equation.id}: ${userAnswer} === ${equation.answer}? ${isCorrect}`)
+      return isCorrect
     })
+
+    console.log('[FactFamily] All correct?', allCorrect)
 
     if (allCorrect) {
       setIsComplete(true)
-      setTimeout(() => onComplete(true), 1500)
+      console.log('[FactFamily] Calling onComplete(true) in 1.5s')
+      setTimeout(() => {
+        console.log('[FactFamily] Calling onComplete(true) NOW')
+        onComplete(true)
+      }, 1500)
     }
   }
 
@@ -257,51 +282,47 @@ export const FactFamilyHouse: React.FC<FactFamilyHouseProps> = ({ family, onComp
                       {/* Equals sign */}
                       <div className="text-4xl font-bold text-gray-700">=</div>
 
-                      {/* Input field */}
-                      <input
-                        type="text"
-                        value={userAnswers[equation.id]}
-                        onChange={(e) => handleInputChange(equation.id, e.target.value)}
-                        onKeyPress={(e) => handleKeyPress(e, equation.id)}
-                        placeholder="?"
-                        className={`w-16 h-16 text-3xl font-bold text-center rounded-lg border-4 focus:outline-none transition-all ${
-                          isCorrect
-                            ? 'bg-green-300 border-green-600 text-green-800'
-                            : isWrong
-                            ? 'bg-red-300 border-red-600 text-red-800'
-                            : 'bg-yellow-100 border-yellow-400 text-gray-800 focus:border-yellow-600'
-                        }`}
-                        disabled={isCorrect}
-                      />
-                    </div>
+                      {/* Input field with feedback icon */}
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="text"
+                          value={userAnswers[equation.id]}
+                          onChange={(e) => handleInputChange(equation.id, e.target.value)}
+                          onKeyPress={(e) => handleKeyPress(e, equation.id)}
+                          placeholder="?"
+                          className={`w-16 h-16 text-3xl font-bold text-center rounded-lg border-4 focus:outline-none transition-all ${
+                            isCorrect
+                              ? 'bg-green-300 border-green-600 text-green-800'
+                              : isWrong
+                              ? 'bg-red-300 border-red-600 text-red-800'
+                              : 'bg-yellow-100 border-yellow-400 text-gray-800 focus:border-yellow-600'
+                          }`}
+                          disabled={isCorrect}
+                        />
 
-                    {/* Feedback only - no check button needed */}
-                    {(isCorrect || isWrong) && (
-                      <div className="flex items-center justify-center gap-4 mt-2">
-                        {isCorrect && (
-                          <motion.div
-                            className="flex items-center gap-2 text-green-600 font-bold text-lg"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: 'spring', stiffness: 300 }}
-                          >
-                            <Check size={24} />
-                            Correct!
-                          </motion.div>
-                        )}
-
-                        {isWrong && (
-                          <motion.div
-                            className="flex items-center gap-2 text-red-600 font-bold text-lg"
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: 1, rotate: 0 }}
-                          >
-                            <X size={24} />
-                            Try again!
-                          </motion.div>
-                        )}
+                        {/* Checkmark or X icon to the right */}
+                        <div className="w-8 h-8 flex items-center justify-center">
+                          {isCorrect && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                            >
+                              <Check size={32} className="text-green-600" strokeWidth={3} />
+                            </motion.div>
+                          )}
+                          {isWrong && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0, rotate: -90 }}
+                              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+                            >
+                              <X size={32} className="text-red-600" strokeWidth={3} />
+                            </motion.div>
+                          )}
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </motion.div>
               )
@@ -333,7 +354,7 @@ export const FactFamilyHouse: React.FC<FactFamilyHouseProps> = ({ family, onComp
                 Equations completed: {Object.values(checkedAnswers).filter(v => v === true).length}/4
               </p>
               <p className="text-sm text-gray-500">
-                💡 Hint: Type your answer and press Enter to check!
+                💡 Hint: Type your answer to check it instantly!
               </p>
 
               {/* Done button - only enabled when all are correct */}

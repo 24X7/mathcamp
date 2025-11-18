@@ -91,31 +91,13 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-xl font-body text-gray-800 leading-relaxed mb-4">
+            <p className="text-xl font-body font-bold text-gray-800 leading-relaxed mb-4">
               {problem.story}
             </p>
-            <p className="text-2xl font-bold text-primary-700">
+            <p className="text-2xl font-normal text-primary-700">
               {problem.question}
             </p>
           </motion.div>
-
-          {/* Visual context hints */}
-          {problem.visualContext && (
-            <div className="flex justify-center gap-4 mb-6">
-              {problem.visualContext.items?.map((item, index) => (
-                <motion.div
-                  key={index}
-                  className="text-3xl"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.2, rotate: 10 }}
-                >
-                  {item}
-                </motion.div>
-              ))}
-            </div>
-          )}
 
           {/* Answer options */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
