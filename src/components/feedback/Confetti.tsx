@@ -1,0 +1,87 @@
+import React, { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+
+interface ConfettiPiece {
+  id: number
+  x: number
+  color: string
+  delay: number
+  duration: number
+  rotation: number
+}
+
+interface ConfettiProps {
+  trigger: boolean
+  onComplete?: () => void
+}
+
+export const Confetti: React.FC<ConfettiProps> = ({ trigger, onComplete }) => {
+  const [pieces, setPieces] = useState<ConfettiPiece[]>([])
+
+  const colors = [
+    '#f87171', // red
+    '#fbbf24', // yellow
+    '#34d399', // green
+    '#60a5fa', // blue
+    '#a78bfa', // purple
+    '#f472b6', // pink
+    '#fb923c', // orange
+  ]
+
+  useEffect(() => {
+    if (trigger) {
+      const newPieces: ConfettiPiece[] = []
+      for (let i = 0; i < 50; i++) {
+        newPieces.push({
+          id: i,
+          x: Math.random() * window.innerWidth,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          delay: Math.random() * 0.5,
+          duration: 2 + Math.random() * 1,
+          rotation: Math.random() * 360,
+        })
+      }
+      setPieces(newPieces)
+
+      const timer = setTimeout(() => {
+        setPieces([])
+        onComplete?.()
+      }, 3500)
+
+      return () => clearTimeout(timer)
+    }
+  }, [trigger])
+
+  if (pieces.length === 0) return null
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50">
+      {pieces.map((piece) => (
+        <motion.div
+          key={piece.id}
+          className="absolute w-3 h-3"
+          style={{
+            left: piece.x,
+            backgroundColor: piece.color,
+            borderRadius: '2px',
+          }}
+          initial={{
+            y: -20,
+            rotate: 0,
+            opacity: 1,
+          }}
+          animate={{
+            y: window.innerHeight + 20,
+            rotate: piece.rotation,
+            opacity: 0,
+          }}
+          transition={{
+            duration: piece.duration,
+            delay: piece.delay,
+            ease: 'easeIn',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
