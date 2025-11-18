@@ -8,10 +8,13 @@ interface ProblemTemplate {
   visualContext?: WordProblem['visualContext']
 }
 
+// Helper function to handle singular/plural
+const plural = (count: number, singular: string, plural: string) => count === 1 ? singular : plural
+
 const templates: ProblemTemplate[] = [
   // Animals theme - Addition
   {
-    story: ([n1, n2]) => `${n1} puppies were playing in the park. ${n2} more puppies came to join them.`,
+    story: ([n1, n2]) => `${n1} ${plural(n1, 'puppy was', 'puppies were')} playing in the park. ${n2} more ${plural(n2, 'puppy', 'puppies')} came to join them.`,
     question: () => 'How many puppies are playing now?',
     operation: 'add',
     theme: 'animals',
@@ -20,7 +23,7 @@ const templates: ProblemTemplate[] = [
 
   // Animals theme - Subtraction
   {
-    story: ([n1, n2]) => `There were ${n1} birds sitting on a tree. ${n2} birds flew away.`,
+    story: ([n1, n2]) => `There ${plural(n1, 'was', 'were')} ${n1} ${plural(n1, 'bird', 'birds')} sitting on a tree. ${n2} ${plural(n2, 'bird', 'birds')} flew away.`,
     question: () => 'How many birds are still on the tree?',
     operation: 'subtract',
     theme: 'animals',
@@ -29,8 +32,8 @@ const templates: ProblemTemplate[] = [
 
   // Animals theme - Comparison
   {
-    story: ([n1, n2]) => `The red barn has ${n1} cows. The blue barn has ${n2} cows.`,
-    question: ([n1, n2]: number[]) => `How many more cows does the ${n1 > n2 ? 'red' : 'blue'} barn have?`,
+    story: ([n1, n2]) => `The red barn has ${n1} ${plural(n1, 'cow', 'cows')}. The blue barn has ${n2} ${plural(n2, 'cow', 'cows')}.`,
+    question: ([n1, n2]: number[]) => `How many more ${plural(Math.abs(n1-n2), 'cow does', 'cows does')} the ${n1 > n2 ? 'red' : 'blue'} barn have?`,
     operation: 'compare',
     theme: 'animals',
     visualContext: { items: ['🐄'] }
@@ -38,7 +41,7 @@ const templates: ProblemTemplate[] = [
 
   // Animals theme - Addition
   {
-    story: ([n1, n2]) => `A farmer has ${n1} chickens. She got ${n2} more chickens from the market.`,
+    story: ([n1, n2]) => `A farmer has ${n1} ${plural(n1, 'chicken', 'chickens')}. She got ${n2} more ${plural(n2, 'chicken', 'chickens')} from the market.`,
     question: () => 'How many chickens does she have now?',
     operation: 'add',
     theme: 'animals',
@@ -47,7 +50,7 @@ const templates: ProblemTemplate[] = [
 
   // Food theme - Addition
   {
-    story: ([n1, n2]) => `You had ${n1} slices of pizza. Your friend gave you ${n2} more slices.`,
+    story: ([n1, n2]) => `You had ${n1} ${plural(n1, 'slice', 'slices')} of pizza. Your friend gave you ${n2} more ${plural(n2, 'slice', 'slices')}.`,
     question: () => 'How many pizza slices do you have now?',
     operation: 'add',
     theme: 'food',
@@ -56,7 +59,7 @@ const templates: ProblemTemplate[] = [
 
   // Food theme - Subtraction
   {
-    story: ([n1, n2]) => `There were ${n1} cookies in the jar. You ate ${n2} cookies.`,
+    story: ([n1, n2]) => `There ${plural(n1, 'was', 'were')} ${n1} ${plural(n1, 'cookie', 'cookies')} in the jar. You ate ${n2} ${plural(n2, 'cookie', 'cookies')}.`,
     question: () => 'How many cookies are left?',
     operation: 'subtract',
     theme: 'food',
@@ -65,8 +68,8 @@ const templates: ProblemTemplate[] = [
 
   // Food theme - Comparison
   {
-    story: ([n1, n2]) => `Sarah has ${n1} apples. Tom has ${n2} apples.`,
-    question: ([n1, n2]: number[]) => `How many more apples does ${n1 > n2 ? 'Sarah' : 'Tom'} have?`,
+    story: ([n1, n2]) => `Sarah has ${n1} ${plural(n1, 'apple', 'apples')}. Tom has ${n2} ${plural(n2, 'apple', 'apples')}.`,
+    question: ([n1, n2]: number[]) => `How many more ${plural(Math.abs(n1-n2), 'apple does', 'apples does')} ${n1 > n2 ? 'Sarah' : 'Tom'} have?`,
     operation: 'compare',
     theme: 'food',
     visualContext: { items: ['🍎'] }
@@ -74,7 +77,7 @@ const templates: ProblemTemplate[] = [
 
   // Food theme - Addition
   {
-    story: ([n1, n2]) => `Mom baked ${n1} cupcakes. Then she baked ${n2} more cupcakes.`,
+    story: ([n1, n2]) => `Mom baked ${n1} ${plural(n1, 'cupcake', 'cupcakes')}. Then she baked ${n2} more ${plural(n2, 'cupcake', 'cupcakes')}.`,
     question: () => 'How many cupcakes did mom bake in total?',
     operation: 'add',
     theme: 'food',
@@ -83,7 +86,7 @@ const templates: ProblemTemplate[] = [
 
   // Toys theme - Addition
   {
-    story: ([n1, n2]) => `You have ${n1} toy cars. Your friend has ${n2} toy cars.`,
+    story: ([n1, n2]) => `You have ${n1} toy ${plural(n1, 'car', 'cars')}. Your friend has ${n2} toy ${plural(n2, 'car', 'cars')}.`,
     question: () => 'How many toy cars do you both have together?',
     operation: 'add',
     theme: 'toys',
@@ -92,7 +95,7 @@ const templates: ProblemTemplate[] = [
 
   // Toys theme - Subtraction
   {
-    story: ([n1, n2]) => `There were ${n1} balloons at the party. ${n2} balloons popped.`,
+    story: ([n1, n2]) => `There ${plural(n1, 'was', 'were')} ${n1} ${plural(n1, 'balloon', 'balloons')} at the party. ${n2} ${plural(n2, 'balloon', 'balloons')} popped.`,
     question: () => 'How many balloons are still good?',
     operation: 'subtract',
     theme: 'toys',
@@ -101,8 +104,8 @@ const templates: ProblemTemplate[] = [
 
   // Toys theme - Comparison
   {
-    story: ([n1, n2]) => `The toy store has ${n1} dolls. The gift shop has ${n2} dolls.`,
-    question: ([n1, n2]: number[]) => `How many more dolls does the ${n1 > n2 ? 'toy store' : 'gift shop'} have?`,
+    story: ([n1, n2]) => `The toy store has ${n1} ${plural(n1, 'doll', 'dolls')}. The gift shop has ${n2} ${plural(n2, 'doll', 'dolls')}.`,
+    question: ([n1, n2]: number[]) => `How many more ${plural(Math.abs(n1-n2), 'doll does', 'dolls does')} the ${n1 > n2 ? 'toy store' : 'gift shop'} have?`,
     operation: 'compare',
     theme: 'toys',
     visualContext: { items: ['🧸'] }
@@ -110,7 +113,7 @@ const templates: ProblemTemplate[] = [
 
   // Toys theme - Addition
   {
-    story: ([n1, n2]) => `Sarah has ${n1} dolls. She got ${n2} more dolls for her birthday.`,
+    story: ([n1, n2]) => `Sarah has ${n1} ${plural(n1, 'doll', 'dolls')}. She got ${n2} more ${plural(n2, 'doll', 'dolls')} for her birthday.`,
     question: () => 'How many dolls does Sarah have now?',
     operation: 'add',
     theme: 'toys',
@@ -119,7 +122,7 @@ const templates: ProblemTemplate[] = [
 
   // Nature theme - Addition
   {
-    story: ([n1, n2]) => `In the garden, there are ${n1} red flowers and ${n2} yellow flowers.`,
+    story: ([n1, n2]) => `In the garden, there ${plural(n1, 'is', 'are')} ${n1} red ${plural(n1, 'flower', 'flowers')} and ${n2} yellow ${plural(n2, 'flower', 'flowers')}.`,
     question: () => 'How many flowers are there in total?',
     operation: 'add',
     theme: 'nature',
@@ -128,7 +131,7 @@ const templates: ProblemTemplate[] = [
 
   // Nature theme - Subtraction
   {
-    story: ([n1, n2]) => `There were ${n1} apples on the tree. ${n2} apples fell down.`,
+    story: ([n1, n2]) => `There ${plural(n1, 'was', 'were')} ${n1} ${plural(n1, 'apple', 'apples')} on the tree. ${n2} ${plural(n2, 'apple', 'apples')} fell down.`,
     question: () => 'How many apples are still on the tree?',
     operation: 'subtract',
     theme: 'nature',
@@ -137,8 +140,8 @@ const templates: ProblemTemplate[] = [
 
   // Nature theme - Comparison
   {
-    story: ([n1, n2]) => `The big tree has ${n1} birds. The small tree has ${n2} birds.`,
-    question: ([n1, n2]: number[]) => `How many more birds does the ${n1 > n2 ? 'big' : 'small'} tree have?`,
+    story: ([n1, n2]) => `The big tree has ${n1} ${plural(n1, 'bird', 'birds')}. The small tree has ${n2} ${plural(n2, 'bird', 'birds')}.`,
+    question: ([n1, n2]: number[]) => `How many more ${plural(Math.abs(n1-n2), 'bird does', 'birds does')} the ${n1 > n2 ? 'big' : 'small'} tree have?`,
     operation: 'compare',
     theme: 'nature',
     visualContext: { items: ['🐦'] }
@@ -146,7 +149,7 @@ const templates: ProblemTemplate[] = [
 
   // Nature theme - Addition
   {
-    story: ([n1, n2]) => `${n1} butterflies were in the garden. ${n2} more butterflies came.`,
+    story: ([n1, n2]) => `${n1} ${plural(n1, 'butterfly was', 'butterflies were')} in the garden. ${n2} more ${plural(n2, 'butterfly', 'butterflies')} came.`,
     question: () => 'How many butterflies are there now?',
     operation: 'add',
     theme: 'nature',
@@ -155,7 +158,7 @@ const templates: ProblemTemplate[] = [
 
   // School theme - Addition
   {
-    story: ([n1, n2]) => `Tom has ${n1} pencils. His teacher gave him ${n2} more pencils.`,
+    story: ([n1, n2]) => `Tom has ${n1} ${plural(n1, 'pencil', 'pencils')}. His teacher gave him ${n2} more ${plural(n2, 'pencil', 'pencils')}.`,
     question: () => 'How many pencils does Tom have now?',
     operation: 'add',
     theme: 'school',
@@ -164,7 +167,7 @@ const templates: ProblemTemplate[] = [
 
   // School theme - Subtraction
   {
-    story: ([n1, n2]) => `There were ${n1} books on the shelf. ${n2} books were borrowed.`,
+    story: ([n1, n2]) => `There ${plural(n1, 'was', 'were')} ${n1} ${plural(n1, 'book', 'books')} on the shelf. ${n2} ${plural(n2, 'book', 'books')} ${plural(n2, 'was', 'were')} borrowed.`,
     question: () => 'How many books are left on the shelf?',
     operation: 'subtract',
     theme: 'school',
@@ -173,8 +176,8 @@ const templates: ProblemTemplate[] = [
 
   // School theme - Comparison
   {
-    story: ([n1, n2]) => `Class A has ${n1} students. Class B has ${n2} students.`,
-    question: ([n1, n2]: number[]) => `How many more students does Class ${n1 > n2 ? 'A' : 'B'} have?`,
+    story: ([n1, n2]) => `Class A has ${n1} ${plural(n1, 'student', 'students')}. Class B has ${n2} ${plural(n2, 'student', 'students')}.`,
+    question: ([n1, n2]: number[]) => `How many more ${plural(Math.abs(n1-n2), 'student does', 'students does')} Class ${n1 > n2 ? 'A' : 'B'} have?`,
     operation: 'compare',
     theme: 'school',
     visualContext: { items: ['👦', '👧'] }
@@ -182,7 +185,7 @@ const templates: ProblemTemplate[] = [
 
   // School theme - Addition
   {
-    story: ([n1, n2]) => `In the classroom, ${n1} students are drawing and ${n2} students are reading.`,
+    story: ([n1, n2]) => `In the classroom, ${n1} ${plural(n1, 'student is', 'students are')} drawing and ${n2} ${plural(n2, 'student is', 'students are')} reading.`,
     question: () => 'How many students are there in total?',
     operation: 'add',
     theme: 'school',
