@@ -112,3 +112,4 @@ Track progress and next steps in `.NEXT_SESSION_HANDOFF.md`
 - Celebrate effort, not just correct answers
 - Make it accessible for all children, including those with disabilities
 - Performance matters - kids have short attention spans
+- never and I mean never make random stuff up

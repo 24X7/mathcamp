@@ -111,15 +111,21 @@ function GameContent() {
     }
 
     setProblemCount(prev => prev + 1)
+    const isLastQuestion = problemCount + 1 >= settings.problemCount
+    let newCorrectCount = correctCount
+
     if (isCorrect) {
+      newCorrectCount = correctCount + 1
       setCorrectCount(prev => prev + 1)
-      // Always show confetti on correct answer
-      setConfettiType('regular')
-      setShowConfetti(true)
+      // Show confetti on correct answer (but NOT on last question)
+      if (!isLastQuestion) {
+        setConfettiType('regular')
+        setShowConfetti(true)
+      }
     }
 
-    if (problemCount + 1 >= settings.problemCount) {
-      endGame()
+    if (isLastQuestion) {
+      endGame(newCorrectCount)
     } else {
       // Generate next problem
       if (currentActivity !== 'fact-family' && currentActivity !== 'word-problem' && currentActivity !== 'counting' && currentActivity !== 'counting-sequence') {
@@ -133,22 +139,13 @@ function GameContent() {
     }
   }
 
-  const endGame = () => {
+  const endGame = (finalCorrectCount: number) => {
+    console.log('[endGame] finalCorrectCount:', finalCorrectCount)
+    console.log('[endGame] settings.problemCount:', settings.problemCount)
+
     if (sessionId) {
       endSession(sessionId)
       const achievements = checkAchievements()
-
-      // Check if they got 100%
-      const got100Percent = correctCount === settings.problemCount
-      if (got100Percent) {
-        // Big fireworks for 100%!
-        setConfettiType('fireworks')
-        setShowConfetti(true)
-      } else if (achievements.length > 0) {
-        // Regular confetti for achievements
-        setConfettiType('regular')
-        setShowConfetti(true)
-      }
 
       // Track analytics: session completed (aggregated only to PostHog)
       const duration = Date.now() - sessionStartTime
@@ -156,13 +153,35 @@ function GameContent() {
         id: sessionId,
         type: currentActivity,
         total: problemCount,
-        correct: correctCount,
+        correct: finalCorrectCount,
         duration,
         startTime: sessionStartTime,
         endTime: Date.now(),
       })
     }
+
+    // Switch to results screen first
     setGameMode('results')
+
+    // Then trigger fireworks or confetti AFTER screen switches
+    setTimeout(() => {
+      const got100Percent = finalCorrectCount === settings.problemCount
+      console.log('[endGame DELAYED] finalCorrectCount:', finalCorrectCount)
+      console.log('[endGame DELAYED] settings.problemCount:', settings.problemCount)
+      console.log('[endGame DELAYED] got100Percent:', got100Percent)
+
+      if (got100Percent) {
+        // Big fireworks for 100%!
+        console.log('[endGame] ✨✨✨ FIREWORKS TIME ✨✨✨')
+        setConfettiType('fireworks')
+        setShowConfetti(true)
+      } else {
+        // Regular confetti if not perfect
+        console.log('[endGame] Regular confetti (not 100%)')
+        setConfettiType('regular')
+        setShowConfetti(true)
+      }
+    }, 300)
   }
 
   const toggleSound = () => {
@@ -201,38 +220,74 @@ function GameContent() {
               </motion.p>
             </div>
 
-            {/* Question count selector */}
-            <motion.div
-              className="bg-white rounded-2xl p-6 mb-8 shadow-lg max-w-md mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <h3 className="text-xl font-heading font-bold text-gray-800 text-center mb-4">
-                How many questions?
-              </h3>
-              <div className="flex justify-center gap-4">
-                {[5, 10, 20].map((count) => (
-                  <motion.button
-                    key={count}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      const newSettings = { ...settings, problemCount: count }
-                      setSettings(newSettings)
-                      saveSettings(newSettings)
-                    }}
-                    className={`px-8 py-3 rounded-lg font-heading font-bold text-lg transition-all ${
-                      settings.problemCount === count
-                        ? 'bg-blue-600 text-white shadow-lg ring-4 ring-blue-200'
-                        : 'bg-white text-gray-800 hover:bg-gray-100 border-2 border-gray-300'
-                    }`}
-                  >
-                    {count}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
+            {/* Question count and difficulty selectors */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
+              {/* Question count */}
+              <motion.div
+                className="bg-white rounded-2xl p-6 shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <h3 className="text-xl font-heading font-bold text-gray-800 text-center mb-4">
+                  How many questions?
+                </h3>
+                <div className="flex justify-center gap-3">
+                  {[5, 10, 20].map((count) => (
+                    <motion.button
+                      key={count}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        const newSettings = { ...settings, problemCount: count }
+                        setSettings(newSettings)
+                        saveSettings(newSettings)
+                      }}
+                      className={`px-6 py-3 rounded-lg font-heading font-bold text-lg transition-all ${
+                        settings.problemCount === count
+                          ? 'bg-blue-600 text-white shadow-lg ring-4 ring-blue-200'
+                          : 'bg-white text-gray-800 hover:bg-gray-100 border-2 border-gray-300'
+                      }`}
+                    >
+                      {count}
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Difficulty */}
+              <motion.div
+                className="bg-white rounded-2xl p-6 shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <h3 className="text-xl font-heading font-bold text-gray-800 text-center mb-4">
+                  Difficulty Level
+                </h3>
+                <div className="flex justify-center gap-3">
+                  {(['easy', 'medium', 'hard'] as const).map((level) => (
+                    <motion.button
+                      key={level}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        const newSettings = { ...settings, difficulty: level }
+                        setSettings(newSettings)
+                        saveSettings(newSettings)
+                      }}
+                      className={`px-6 py-3 rounded-lg font-heading font-bold text-lg capitalize transition-all ${
+                        settings.difficulty === level
+                          ? 'bg-blue-600 text-white shadow-lg ring-4 ring-blue-200'
+                          : 'bg-white text-gray-800 hover:bg-gray-100 border-2 border-gray-300'
+                      }`}
+                    >
+                      {level}
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {activities.map((activity, index) => (
@@ -271,14 +326,6 @@ function GameContent() {
               >
                 Progress
               </Button>
-              <Button
-                variant="ghost"
-                size="large"
-                onClick={() => setGameMode('settings')}
-                icon={<SettingsIcon />}
-              >
-                Settings
-              </Button>
             </div>
           </motion.div>
         )}
@@ -300,19 +347,9 @@ function GameContent() {
                 >
                   Home
                 </Button>
-                <div className="flex items-center gap-4">
-                  <span className="text-xl font-bold text-gray-700">
-                    Question {problemCount + 1} / {settings.problemCount}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={toggleSound}
-                    icon={settings.soundEnabled ? <Volume2 /> : <VolumeX />}
-                  >
-                    {settings.soundEnabled ? 'Sound On' : 'Sound Off'}
-                  </Button>
-                </div>
+                <span className="text-xl font-bold text-gray-700">
+                  Question {problemCount + 1} / {settings.problemCount}
+                </span>
               </div>
 
               {currentActivity === 'addition' && currentProblem && (
@@ -470,112 +507,6 @@ function GameContent() {
           </motion.div>
         )}
 
-        {gameMode === 'settings' && (
-          <motion.div
-            key="settings"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="max-w-2xl mx-auto"
-          >
-            <Card variant="gradient" padding="large">
-              <h2 className="text-4xl font-heading font-bold text-primary-600 mb-8 text-center">
-                Settings
-              </h2>
-
-              <div className="space-y-6">
-                {/* Sound Settings */}
-                <div className="bg-white/80 rounded-xl p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-700">Sound Effects</h3>
-                      <p className="text-sm text-gray-600">Play sounds when answering problems</p>
-                    </div>
-                    <button
-                      onClick={toggleSound}
-                      className={`relative inline-flex h-10 w-20 items-center rounded-full transition-colors ${
-                        settings.soundEnabled ? 'bg-green-500' : 'bg-gray-300'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-8 w-8 transform rounded-full bg-white transition-transform ${
-                          settings.soundEnabled ? 'translate-x-11' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Difficulty Setting */}
-                <div className="bg-white/80 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-gray-700 mb-4">Difficulty Level</h3>
-                  <div className="flex gap-3">
-                    {(['easy', 'medium', 'hard'] as const).map((level) => (
-                      <button
-                        key={level}
-                        onClick={() => {
-                          const newSettings = { ...settings, difficulty: level }
-                          setSettings(newSettings)
-                          saveSettings(newSettings)
-                        }}
-                        className={`flex-1 py-3 px-4 rounded-lg font-bold capitalize transition-colors ${
-                          settings.difficulty === level
-                            ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                            : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-300'
-                        }`}
-                      >
-                        {level}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Problem Count Setting */}
-                <div className="bg-white/80 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-gray-700 mb-4">Questions per Session</h3>
-                  <div className="flex gap-3">
-                    {[5, 10, 20].map((count) => (
-                      <button
-                        key={count}
-                        onClick={() => {
-                          const newSettings = { ...settings, problemCount: count }
-                          setSettings(newSettings)
-                          saveSettings(newSettings)
-                        }}
-                        className={`flex-1 py-3 px-4 rounded-lg font-bold transition-colors ${
-                          settings.problemCount === count
-                            ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                            : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-300'
-                        }`}
-                      >
-                        {count}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Privacy Note */}
-                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-blue-800 mb-2">🔒 Privacy First</h3>
-                  <p className="text-sm text-blue-700">
-                    All your learning data stays on this device. We never send your answers, scores, or personal information to the cloud.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-8 text-center">
-                <Button
-                  variant="primary"
-                  size="large"
-                  onClick={() => setGameMode('menu')}
-                  icon={<Home />}
-                >
-                  Back to Menu
-                </Button>
-              </div>
-            </Card>
-          </motion.div>
-        )}
       </AnimatePresence>
 
       <Confetti trigger={showConfetti} type={confettiType} onComplete={() => setShowConfetti(false)} />
