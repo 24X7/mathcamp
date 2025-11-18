@@ -171,32 +171,70 @@ const generateCountingPlan = (problemCount: number, difficulty: Difficulty): Ses
   return plan
 }
 
-// Counting Sequence plan - Equal distribution with no back-to-back repeats
+// Counting Sequence plan - Ensure variety and proper starting numbers
 const generateCountingSequencePlan = (
   problemCount: number,
   difficulty: Difficulty
 ): SessionPlan[] => {
   const plan: SessionPlan[] = []
   const usedAnswers = new Set<number>()
-  const allStepSizes = [1, 2, 5, 10]
-  let lastStepSize: number | null = null
+  const stepSizeCounts: Record<number, number> = { 2: 0, 3: 0, 5: 0, 10: 0 }
 
   for (let i = 0; i < problemCount; i++) {
     let planItem: SessionPlan | null = null
     let attempts = 0
 
     while (!planItem && attempts < 50) {
-      // Get available step sizes (exclude the last one to prevent back-to-back)
-      const availableSteps = lastStepSize !== null
-        ? allStepSizes.filter(step => step !== lastStepSize)
-        : allStepSizes
+      let stepSize: number
 
-      // Randomly pick from available steps with equal probability
-      const stepSize = availableSteps[Math.floor(Math.random() * availableSteps.length)]
+      if (difficulty === 'easy') {
+        // Easy: 1s and 2s
+        stepSize = Math.random() < 0.3 ? 1 : 2
+      } else if (difficulty === 'medium') {
+        // Medium: Ensure at least one of each 2, 3, 5
+        const needsStepSize = [2, 3, 5].find(s => stepSizeCounts[s] === 0 && plan.length < problemCount - 1)
+        if (needsStepSize && i < problemCount - 2) {
+          stepSize = needsStepSize
+        } else {
+          const stepChance = Math.random()
+          stepSize = stepChance < 0.15 ? 1 : stepChance < 0.35 ? 2 : stepChance < 0.55 ? 3 : 5
+        }
+      } else {
+        // Hard: Ensure at least one of each 2, 3, 5, 10
+        const needsStepSize = [2, 3, 5, 10].find(s => stepSizeCounts[s] === 0 && plan.length < problemCount - 1)
+        if (needsStepSize && i < problemCount - 3) {
+          stepSize = needsStepSize
+        } else {
+          const stepChance = Math.random()
+          stepSize = stepChance < 0.1 ? 1 : stepChance < 0.25 ? 2 : stepChance < 0.4 ? 3 : stepChance < 0.65 ? 5 : 10
+        }
+      }
 
-      // Generate random start based on step size
-      const maxStart = stepSize === 1 ? 50 : stepSize === 2 ? 40 : stepSize === 5 ? 30 : 20
-      const startNum = Math.floor(Math.random() * maxStart) + 1
+      // Generate random start based on step size with PROPER starting numbers
+      let startNum: number
+
+      if (stepSize === 2) {
+        // For counting by 2s, always start with an even number
+        const maxStart = 40
+        const randomEven = Math.floor(Math.random() * (maxStart / 2)) * 2 + 2 // 2, 4, 6, 8, etc.
+        startNum = randomEven
+      } else if (stepSize === 3) {
+        // For counting by 3s, always start with a number ending in 0, 3, 6, or 9
+        const validStarts = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]
+        startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
+      } else if (stepSize === 5) {
+        // For counting by 5s, always start with a number ending in 0 or 5
+        const validStarts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
+      } else if (stepSize === 10) {
+        // For counting by 10s, always start with a number ending in 0 or 5
+        const validStarts = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+        startNum = validStarts[Math.floor(Math.random() * validStarts.length)]
+      } else {
+        // For counting by 1s, any number is fine
+        const maxStart = 50
+        startNum = Math.floor(Math.random() * maxStart) + 1
+      }
 
       // Calculate correct answer
       const sequenceLength = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6
@@ -210,7 +248,11 @@ const generateCountingSequencePlan = (
       if (!usedAnswers.has(correctAnswer)) {
         planItem = { stepSize, startNum, correctAnswer }
         usedAnswers.add(correctAnswer)
-        lastStepSize = stepSize
+
+        // Track step size counts
+        if (stepSize in stepSizeCounts) {
+          stepSizeCounts[stepSize]++
+        }
       }
 
       attempts++
