@@ -1,0 +1,8 @@
+# Bun configuration
+# This file configures Bun's test runner to ignore Playwright test files
+
+[test]
+# Only run files matching this pattern with Bun's test runner
+# (Currently no Bun tests, only Playwright E2E tests)
+# Playwright tests should be run with: bunx playwright test
+root = "./tests/unit"

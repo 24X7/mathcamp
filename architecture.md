@@ -59,6 +59,14 @@ All components should:
 - Implement subtle hover states
 
 ### State Management
+
+MathCamp uses a **dual-layer state management system**:
+
+1. **SessionManager (In-Memory)**: Quiz session state that persists across route navigation but clears on homepage return
+2. **ProgressProvider (localStorage)**: Long-term progress data that persists across browser sessions
+
+See [SESSION_MANAGEMENT.md](./SESSION_MANAGEMENT.md) for detailed documentation.
+
 ```typescript
 // Local storage keys
 PROGRESS_KEY = 'mathcamp_progress'
@@ -66,11 +74,15 @@ SETTINGS_KEY = 'mathcamp_settings'
 USER_PROFILE_KEY = 'mathcamp_profile'
 
 // Context providers
-- ThemeProvider: Dark/light/auto themes
-- ProgressProvider: Track learning progress
-- AudioProvider: Sound effects and music
-- SettingsProvider: User preferences
+- ProgressProvider: Track learning progress (localStorage)
+- SessionManager: Temporary quiz session state (in-memory)
 ```
+
+**Critical Session Rules:**
+- ✅ Sessions clear when navigating to homepage (prevents score accumulation)
+- ✅ Back button blocked during quizzes (uses `replace: true`)
+- ✅ Results page back button returns to homepage
+- ✅ Maximum score capped at 100% (no double-counting)
 
 ## Feature Modules
 

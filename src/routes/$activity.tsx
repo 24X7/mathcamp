@@ -4,7 +4,7 @@ import { getSettings } from '@/utils/localStorage'
 import { generateSessionPlan, SessionPlan } from '@/utils/sessionPlanner'
 
 // Session state manager that persists across navigations
-class SessionManager {
+export class SessionManager {
   private static instance: SessionManager
   private sessions: Map<string, {
     sessionId: string
@@ -46,6 +46,10 @@ class SessionManager {
 
   clearSession(activity: string) {
     this.sessions.delete(activity)
+  }
+
+  clearAllSessions() {
+    this.sessions.clear()
   }
 }
 

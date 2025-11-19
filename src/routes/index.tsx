@@ -7,9 +7,18 @@ import { Card } from '@/components/ui/Card'
 import { Settings, ProblemType } from '@/types'
 import { getSettings, saveSettings } from '@/utils/localStorage'
 import { Trophy } from 'lucide-react'
+import { SessionManager } from './$activity'
 
 export const Route = createFileRoute('/')({
   component: MenuScreen,
+  beforeLoad: () => {
+    // CRITICAL: Clear all SessionManager sessions when returning to homepage
+    // This prevents double-counting scores when starting a new game after
+    // completing a previous session
+    const sessionManager = SessionManager.getInstance()
+    sessionManager.clearAllSessions()
+    console.log('[MenuScreen beforeLoad] Cleared all SessionManager sessions')
+  },
 })
 
 function MenuScreen() {

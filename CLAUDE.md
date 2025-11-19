@@ -28,6 +28,7 @@ MathCamp is an engaging, privacy-focused math learning application designed spec
 
 ## Current Architecture
 See `architecture.md` for detailed technical architecture and development rules.
+See `SESSION_MANAGEMENT.md` for quiz session lifecycle and state management patterns.
 
 ## Session Context Rules
 When working on this project:
