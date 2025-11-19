@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -26,6 +26,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
   const [options, setOptions] = useState<number[]>([])
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const itemTypes = [
     { type: 'pizza', emoji: '🍕', colors: ['red', 'yellow'] },
@@ -139,16 +140,26 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
     setOptions(opts.sort(() => Math.random() - 0.5))
   }
 
+  // Cleanup timeout on unmount to prevent navigation after user leaves
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
   const handleAnswer = (answer: number) => {
     setSelectedAnswer(answer)
     setShowFeedback(true)
     const isCorrect = answer === correctCount
 
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       onAnswer(answer, isCorrect)
       setSelectedAnswer(null)
       setShowFeedback(false)
       generateItems() // Generate new items for next round
+      timeoutRef.current = null
     }, 2000)
   }
 

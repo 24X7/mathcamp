@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -130,6 +130,7 @@ export const CountingSequence: React.FC<CountingSequenceProps> = ({
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
   const [options, setOptions] = useState<number[]>([])
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (sessionPlan.length > 0 && currentProblemIndex < sessionPlan.length) {
@@ -192,16 +193,26 @@ export const CountingSequence: React.FC<CountingSequenceProps> = ({
     setOptions(allAnswers.sort(() => Math.random() - 0.5))
   }
 
+  // Cleanup timeout on unmount to prevent navigation after user leaves
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
   const handleAnswer = (answer: number) => {
     setSelectedAnswer(answer)
     setShowFeedback(true)
     const correctAnswer = sessionPlan[currentProblemIndex].correctAnswer
     const isCorrect = answer === correctAnswer
 
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       onAnswer(answer, isCorrect)
       setSelectedAnswer(null)
       setShowFeedback(false)
+      timeoutRef.current = null
     }, 2000)
   }
 

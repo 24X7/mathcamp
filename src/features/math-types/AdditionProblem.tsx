@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -13,6 +13,7 @@ interface AdditionProblemProps {
 export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAnswer }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Parse the problem (e.g., "5 + 3" or "8 - 2")
   const isSubtraction = problem.question.includes('-')
@@ -21,16 +22,26 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
   const num1 = parts[0]
   const num2 = parts[1]
 
+  // Cleanup timeout on unmount to prevent navigation after user leaves
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
   const handleAnswer = (answer: number) => {
     setSelectedAnswer(answer)
     setShowFeedback(true)
     const isCorrect = answer === problem.correctAnswer
 
     // Wait longer for wrong answers to show feedback (2.5s), faster for correct (1.5s)
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       onAnswer(answer, isCorrect)
       setSelectedAnswer(null)
       setShowFeedback(false)
+      timeoutRef.current = null
     }, isCorrect ? 1500 : 2500)
   }
 
