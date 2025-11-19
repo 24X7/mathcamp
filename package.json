@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
+    "@tanstack/router-plugin": "^1.136.11",
     "@types/bun": "latest",
     "@vitejs/plugin-react": "^5.1.1",
     "clsx": "^2.1.1",

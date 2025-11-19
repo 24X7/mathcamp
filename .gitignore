@@ -33,3 +33,6 @@ yarn-error.log*
 # Temporary files
 *.tmp
 .cache/
+
+# TanStack Router
+src/routeTree.gen.ts

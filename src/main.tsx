@@ -2,8 +2,19 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import posthog from 'posthog-js'
 import { PostHogProvider } from '@posthog/react'
-import App from './App'
+import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { routeTree } from './routeTree.gen'
 import './styles/index.css'
+
+// Create the router instance
+const router = createRouter({ routeTree })
+
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
 
 // PostHog configuration - Privacy-first for children's app
 // NOTE: Set your PostHog API key and host in environment variables
@@ -96,7 +107,7 @@ if (POSTHOG_API_KEY) {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <PostHogProvider client={posthog}>
-      <App />
+      <RouterProvider router={router} />
     </PostHogProvider>
   </React.StrictMode>
 )
