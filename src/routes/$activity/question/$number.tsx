@@ -125,6 +125,7 @@ function QuestionScreen() {
     })
 
     // Navigate to next question or results
+    // Use replace: true to prevent back button from going through all questions
     if (isLastQuestion) {
       navigate({
         to: '/$activity/results',
@@ -135,11 +136,13 @@ function QuestionScreen() {
           sessionId: session.sessionId,
           duration: Date.now() - session.sessionStartTime,
         },
+        replace: true,
       })
     } else {
       navigate({
         to: '/$activity/question/$number',
         params: { activity, number: (currentQuestionNumber + 1).toString() },
+        replace: true,
       })
     }
   }

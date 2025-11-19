@@ -37,6 +37,22 @@ function ResultsScreen() {
   const [showConfetti, setShowConfetti] = useState(false)
   const [confettiType, setConfettiType] = useState<'regular' | 'fireworks'>('regular')
 
+  // Override back button to go to home instead of questions
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      e.preventDefault()
+      navigate({ to: '/', replace: true })
+    }
+
+    // Add a new history entry so back button has somewhere to go
+    window.history.pushState(null, '', window.location.href)
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [navigate])
+
   // End session and track analytics on mount
   useEffect(() => {
     if (sessionId) {
