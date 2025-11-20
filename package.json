@@ -17,6 +17,8 @@
     "test:ui-interactions": "bunx playwright test tests/e2e/ui-interactions.spec.ts",
     "test:accessibility": "bunx playwright test tests/e2e/accessibility.spec.ts",
     "test:chromium": "bunx playwright test --project=chromium",
+    "test:mobile": "bunx playwright test tests/e2e/mobile-visual-regression.spec.ts",
+    "test:mobile:headed": "bunx playwright test tests/e2e/mobile-visual-regression.spec.ts --headed",
     "test:report": "bunx playwright show-report",
     "test:install": "bunx playwright install"
   },
