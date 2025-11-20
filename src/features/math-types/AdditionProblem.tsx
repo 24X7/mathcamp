@@ -181,7 +181,7 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
             />
 
             {/* Answer area */}
-            <div className="relative flex items-center justify-center w-48">
+            <div className="relative flex items-center justify-center w-48 gap-3">
               <div className="relative inline-block">
                 <motion.span
                   key={selectedAnswer ?? 'question'}
@@ -213,13 +213,13 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
                 )}
               </div>
 
-              {/* Show correct answer in green circle for wrong attempts */}
+              {/* Show correct answer in green circle for wrong attempts - to the right */}
               {showFeedback && selectedAnswer !== problem.correctAnswer && (
                 <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="absolute -bottom-20 flex items-center justify-center"
+                  className="flex items-center"
                 >
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center flex-shrink-0">
                     {/* Correct answer number appears first */}
@@ -266,11 +266,6 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
                 </motion.div>
               )}
             </div>
-
-            {/* Extra spacing when showing correct answer below */}
-            {showFeedback && selectedAnswer !== problem.correctAnswer && (
-              <div className="h-20" />
-            )}
           </div>
 
 
