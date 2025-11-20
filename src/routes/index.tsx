@@ -167,13 +167,13 @@ function MenuScreen() {
               padding="medium"
               interactive
               onClick={() => startGame(activity.type)}
-              className="cursor-pointer"
+              className="cursor-pointer min-h-[180px] sm:min-h-[160px]"
             >
-              <div className="flex flex-col items-center">
-                <div className={`${activity.color} rounded-full p-6 mb-4`}>
-                  <span className="text-5xl">{activity.emoji}</span>
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className={`${activity.color} rounded-full p-6 sm:p-6 mb-4`}>
+                  <span className="text-5xl sm:text-5xl">{activity.emoji}</span>
                 </div>
-                <h3 className="text-2xl font-heading font-bold text-gray-800">{activity.name}</h3>
+                <h3 className="text-xl sm:text-2xl font-heading font-bold text-gray-800">{activity.name}</h3>
               </div>
             </Card>
           </motion.div>

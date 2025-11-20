@@ -54,11 +54,11 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
             {isSubtraction ? "Let's Subtract!" : "Let's Add!"}
           </h2>
 
-          <div className="flex justify-center items-center gap-4 mb-8">
+          <div className="flex justify-center items-center gap-2 sm:gap-4 mb-6 sm:mb-8 flex-wrap">
             <AnimatedNumber value={num1} size="huge" color="text-primary-500" />
-            <span className="text-6xl font-bold text-gray-600">{isSubtraction ? '-' : '+'}</span>
+            <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-600">{isSubtraction ? '-' : '+'}</span>
             <AnimatedNumber value={num2} size="huge" color="text-secondary-500" />
-            <span className="text-6xl font-bold text-gray-600">=</span>
+            <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-600">=</span>
 
             {/* Show selected answer or ? */}
             <div className="relative inline-flex items-center gap-3">
@@ -67,7 +67,7 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
                   key={selectedAnswer ?? 'question'}
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className={`text-6xl font-bold ${
+                  className={`text-4xl sm:text-5xl md:text-6xl font-bold ${
                     selectedAnswer === null
                       ? 'text-accent-500'
                       : showFeedback && selectedAnswer === problem.correctAnswer
@@ -85,7 +85,7 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
                   <motion.div
                     initial={{ scale: 0, rotate: -45 }}
                     animate={{ scale: 1.2, rotate: 0 }}
-                    className="absolute inset-0 flex items-center justify-center text-7xl text-red-600 font-black"
+                    className="absolute inset-0 flex items-center justify-center text-5xl sm:text-6xl md:text-7xl text-red-600 font-black"
                     style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.4)' }}
                   >
                     ✗
@@ -101,13 +101,13 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
                   transition={{ delay: 0.2 }}
                   className="flex items-center"
                 >
-                  <div className="relative w-24 h-24 flex items-center justify-center">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 flex items-center justify-center flex-shrink-0">
                     {/* Correct answer number appears first */}
                     <motion.span
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.3, duration: 0.3 }}
-                      className="text-5xl font-bold text-green-700 relative z-10"
+                      className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-700 relative z-10"
                     >
                       {problem.correctAnswer}
                     </motion.span>
@@ -138,7 +138,7 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
                       initial={{ scale: 0, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 1.1, type: "spring", stiffness: 200 }}
-                      className="absolute -top-2 -right-2 text-3xl"
+                      className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 text-2xl sm:text-3xl"
                     >
                       ✓
                     </motion.div>
