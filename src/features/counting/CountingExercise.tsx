@@ -172,7 +172,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
     <div className="max-w-4xl mx-auto p-4">
       <Card variant="gradient" padding="large">
         <div className="text-center">
-          <h2 className="text-3xl font-heading font-bold text-primary-600 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-heading font-bold text-primary-600 mb-4">
             Count the Items!
           </h2>
 
@@ -188,7 +188,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
               {items.map((item, index) => (
                 <motion.div
                   key={item.id}
-                  className={`absolute text-5xl cursor-pointer select-none ${
+                  className={`absolute text-4xl sm:text-5xl cursor-pointer select-none ${
                     item.isTarget ? 'filter brightness-125' : 'opacity-70'
                   }`}
                   style={{
@@ -228,7 +228,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
 
           {/* Question with target emoji */}
           <motion.div
-            className="text-2xl font-bold text-gray-700 mb-2"
+            className="text-xl sm:text-2xl font-bold text-gray-700 mb-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -237,7 +237,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
           </motion.div>
 
           <motion.div
-            className="text-lg text-gray-600 mb-6"
+            className="text-base sm:text-lg text-gray-600 mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -272,7 +272,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
                     size="large"
                     onClick={() => !showFeedback && handleAnswer(option)}
                     disabled={showFeedback}
-                    className={`w-full text-white text-3xl font-bold ${
+                    className={`w-full text-white text-2xl sm:text-3xl font-bold min-h-[72px] sm:min-h-[80px] ${
                       showResult && !isCorrect ? 'animate-shake' : ''
                     } ${showResult && isCorrect ? 'animate-pop' : ''}`}
                   >
@@ -285,7 +285,7 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
 
           {showFeedback && (
             <motion.div
-              className={`mt-6 text-2xl font-bold ${
+              className={`mt-6 text-xl sm:text-2xl font-bold ${
                 selectedAnswer === correctCount
                   ? 'text-green-600'
                   : 'text-orange-600'

@@ -83,7 +83,7 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
       <Card variant="gradient" padding="large">
         <div className="text-center">
           <motion.div
-            className="inline-block text-6xl mb-4"
+            className="inline-block text-4xl sm:text-5xl md:text-6xl mb-4"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200 }}
@@ -91,7 +91,7 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
             {getThemeEmoji()}
           </motion.div>
 
-          <h2 className="text-3xl font-heading font-bold text-primary-600 mb-6">
+          <h2 className="text-2xl sm:text-3xl font-heading font-bold text-primary-600 mb-6">
             Story Problem
           </h2>
 
@@ -102,10 +102,10 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-xl font-body font-bold text-gray-800 leading-relaxed mb-4">
+            <p className="text-lg sm:text-xl font-body font-bold text-gray-800 leading-relaxed mb-4">
               {problem.story}
             </p>
-            <p className="text-2xl font-normal text-primary-700">
+            <p className="text-xl sm:text-2xl font-normal text-primary-700">
               {problem.question}
             </p>
           </motion.div>
@@ -137,7 +137,7 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
                     size="large"
                     onClick={() => !showFeedback && handleAnswer(option)}
                     disabled={showFeedback}
-                    className={`w-full text-white text-3xl font-bold ${
+                    className={`w-full text-white text-2xl sm:text-3xl font-bold min-h-[72px] sm:min-h-[80px] ${
                       showResult && !isCorrect ? 'animate-shake' : ''
                     } ${showResult && isCorrect ? 'animate-pop' : ''}`}
                   >
@@ -150,7 +150,7 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
 
           {showFeedback && (
             <motion.div
-              className={`mt-6 text-2xl font-bold ${
+              className={`mt-6 text-xl sm:text-2xl font-bold ${
                 selectedAnswer === problem.answer
                   ? 'text-green-600'
                   : 'text-orange-600'
