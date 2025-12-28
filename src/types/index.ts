@@ -2,6 +2,8 @@
 export type ProblemType =
   | 'addition'
   | 'subtraction'
+  | 'multiplication'
+  | 'division'
   | 'comparison'
   | 'fact-family'
   | 'word-problem'

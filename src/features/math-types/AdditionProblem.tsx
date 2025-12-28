@@ -15,12 +15,28 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
   const [showFeedback, setShowFeedback] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Parse the problem (e.g., "5 + 3" or "8 - 2")
-  const isSubtraction = problem.question.includes('-')
-  const separator = isSubtraction ? '-' : '+'
-  const parts = problem.question.split(separator).map(p => parseInt(p.trim()))
+  // Parse the problem - detect operation type from the question string
+  const detectOperation = () => {
+    if (problem.question.includes('×')) return { op: '×', type: 'multiplication' as const }
+    if (problem.question.includes('÷')) return { op: '÷', type: 'division' as const }
+    if (problem.question.includes('-')) return { op: '-', type: 'subtraction' as const }
+    return { op: '+', type: 'addition' as const }
+  }
+  
+  const { op, type: operationType } = detectOperation()
+  const parts = problem.question.split(op).map(p => parseInt(p.trim()))
   const num1 = parts[0]
   const num2 = parts[1]
+  
+  // Get title based on operation type
+  const getTitle = () => {
+    switch (operationType) {
+      case 'multiplication': return "Let's Multiply!"
+      case 'division': return "Let's Divide!"
+      case 'subtraction': return "Let's Subtract!"
+      default: return "Let's Add!"
+    }
+  }
 
   // Cleanup timeout on unmount to prevent navigation after user leaves
   useEffect(() => {
@@ -51,14 +67,14 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
       <Card variant="gradient" padding="large">
         <div className="text-center mb-8">
           <h2 className="text-4xl font-heading font-bold text-primary-600 mb-4">
-            {isSubtraction ? "Let's Subtract!" : "Let's Add!"}
+            {getTitle()}
           </h2>
 
           {/* Horizontal format for larger screens (md and up) */}
           <div className="hidden md:flex justify-center items-center gap-2 sm:gap-4 mb-6 sm:mb-8 flex-wrap">
-            <AnimatedNumber value={num1} size="huge" color="text-primary-500" />
-            <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-600">{isSubtraction ? '-' : '+'}</span>
-            <AnimatedNumber value={num2} size="huge" color="text-secondary-500" />
+            <AnimatedNumber value={num1 ?? 0} size="huge" color="text-primary-500" />
+            <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-600">{op}</span>
+            <AnimatedNumber value={num2 ?? 0} size="huge" color="text-secondary-500" />
             <span className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-600">=</span>
 
             {/* Show selected answer or ? */}
@@ -158,7 +174,7 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <AnimatedNumber value={num1} size="huge" color="text-primary-500" />
+              <AnimatedNumber value={num1 ?? 0} size="huge" color="text-primary-500" />
             </motion.div>
 
             {/* Operator and second number */}
@@ -168,8 +184,8 @@ export const AdditionProblem: React.FC<AdditionProblemProps> = ({ problem, onAns
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <span className="text-4xl sm:text-5xl font-bold text-gray-600 mr-2">{isSubtraction ? '−' : '+'}</span>
-              <AnimatedNumber value={num2} size="huge" color="text-secondary-500" />
+              <span className="text-4xl sm:text-5xl font-bold text-gray-600 mr-2">{op}</span>
+              <AnimatedNumber value={num2 ?? 0} size="huge" color="text-secondary-500" />
             </motion.div>
 
             {/* Horizontal line */}
