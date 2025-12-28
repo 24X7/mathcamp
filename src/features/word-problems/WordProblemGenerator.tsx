@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { WordProblem } from '@/types'
+import { generateAnswerOptions } from '@/utils/generateAnswerOptions'
 
 interface WordProblemGeneratorProps {
   problem: WordProblem
@@ -14,16 +15,10 @@ export const WordProblemGenerator: React.FC<WordProblemGeneratorProps> = ({ prob
   const [showFeedback, setShowFeedback] = useState(false)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Generate answer options
+  // Generate validated answer options
   const generateOptions = () => {
-    const options = [problem.answer]
-    while (options.length < 4) {
-      const wrongAnswer = problem.answer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1)
-      if (wrongAnswer >= 0 && !options.includes(wrongAnswer)) {
-        options.push(wrongAnswer)
-      }
-    }
-    return options.sort(() => Math.random() - 0.5)
+    const { options } = generateAnswerOptions(problem.answer, 4, 0)
+    return options
   }
 
   const [options, setOptions] = useState<number[]>(() => generateOptions())

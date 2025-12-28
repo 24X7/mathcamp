@@ -1,4 +1,5 @@
 import { Problem, Difficulty, ProblemType } from '@/types'
+import { generateAnswerOptions } from '@/utils/generateAnswerOptions'
 
 export const generateAdditionProblem = (difficulty: Difficulty): Problem => {
   let max1, max2
@@ -22,17 +23,13 @@ export const generateAdditionProblem = (difficulty: Difficulty): Problem => {
   const num2 = Math.floor(Math.random() * max2) + 1
   const answer = num1 + num2
 
-  // Generate wrong options
-  const options = [answer]
-  while (options.length < 4) {
-    const wrongAnswer = answer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1)
-    if (wrongAnswer > 0 && !options.includes(wrongAnswer)) {
-      options.push(wrongAnswer)
-    }
+  // Generate validated answer options
+  const { options, isValid } = generateAnswerOptions(answer, 4, 1)
+  
+  // Regenerate problem if valid options couldn't be generated
+  if (!isValid) {
+    return generateAdditionProblem(difficulty)
   }
-
-  // Shuffle options
-  options.sort(() => Math.random() - 0.5)
 
   return {
     id: `add-${Date.now()}-${Math.random()}`,
@@ -73,17 +70,13 @@ export const generateSubtractionProblem = (difficulty: Difficulty): Problem => {
 
   const answer = num1 - num2
 
-  // Generate wrong options
-  const options = [answer]
-  while (options.length < 4) {
-    const wrongAnswer = answer + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1)
-    if (wrongAnswer >= 0 && !options.includes(wrongAnswer)) {
-      options.push(wrongAnswer)
-    }
+  // Generate validated answer options (minValue=0 since subtraction can result in 0)
+  const { options, isValid } = generateAnswerOptions(answer, 4, 0)
+  
+  // Regenerate problem if valid options couldn't be generated
+  if (!isValid) {
+    return generateSubtractionProblem(difficulty)
   }
-
-  // Shuffle options
-  options.sort(() => Math.random() - 0.5)
 
   return {
     id: `sub-${Date.now()}-${Math.random()}`,

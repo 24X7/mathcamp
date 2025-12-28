@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Difficulty } from '@/types'
+import { generateAnswerOptions } from '@/utils/generateAnswerOptions'
 
 interface CountingExerciseProps {
   difficulty: Difficulty
@@ -129,15 +130,9 @@ export const CountingExercise: React.FC<CountingExerciseProps> = ({ difficulty, 
     setItems(newItems)
     setCorrectCount(targetCount)
 
-    // Generate answer options
-    const opts = [targetCount]
-    while (opts.length < 4) {
-      const wrong = targetCount + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1)
-      if (wrong > 0 && !opts.includes(wrong)) {
-        opts.push(wrong)
-      }
-    }
-    setOptions(opts.sort(() => Math.random() - 0.5))
+    // Generate validated answer options
+    const { options: opts } = generateAnswerOptions(targetCount, 4, 1)
+    setOptions(opts)
   }
 
   // Cleanup timeout on unmount to prevent navigation after user leaves
