@@ -165,6 +165,12 @@ function QuestionScreen() {
         {activity === 'subtraction' && currentProblem && (
           <AdditionProblem problem={currentProblem} onAnswer={handleAnswer} />
         )}
+        {activity === 'multiplication' && currentProblem && (
+          <AdditionProblem problem={currentProblem} onAnswer={handleAnswer} />
+        )}
+        {activity === 'division' && currentProblem && (
+          <AdditionProblem problem={currentProblem} onAnswer={handleAnswer} />
+        )}
         {activity === 'fact-family' && session.sessionPlan.length > 0 && (
           <FactFamilyHouse
             family={factFamily}

@@ -40,6 +40,8 @@ function MenuScreen() {
   const activities: { type: ProblemType; name: string; emoji: string; color: string }[] = [
     { type: 'addition', name: 'Addition', emoji: '➕', color: 'bg-blue-500' },
     { type: 'subtraction', name: 'Subtraction', emoji: '➖', color: 'bg-red-500' },
+    { type: 'multiplication', name: 'Multiplication', emoji: '✖️', color: 'bg-teal-500' },
+    { type: 'division', name: 'Division', emoji: '➗', color: 'bg-amber-500' },
     { type: 'fact-family', name: 'Fact Families', emoji: '🏠', color: 'bg-orange-500' },
     { type: 'word-problem', name: 'Word Problems', emoji: '📖', color: 'bg-green-500' },
     { type: 'counting', name: 'Counting', emoji: '🔢', color: 'bg-pink-500' },
